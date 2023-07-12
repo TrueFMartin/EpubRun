@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang=en>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function handleAutoChapter() {
+            fetch('/build')
+                .then(function(response) {
+                    updateLink();
+                })
+                .catch(function(error) {
+                    console.log('Error:', error.message);
+                });
+        }
+
+        //Update text and link for added book
+        function updateLink() {
+            $.ajax({
+            type: 'GET',
+            url: '/getLinkUpdate', // Replace with your server endpoint
+            success: function(response) {
+                console.log(response + " FROM UPDATE LINK")                
+                // $('#dynamicLink').href = "assets/" + response; 
+                // $('#dynamicLink').text = response; 
+                window.location.reload();
+                
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+            });
+        }
+    
+        $(document).ready(function() {
+            $('#altChapForm').submit(function(event) {
+            event.preventDefault(); // Prevents the default form submission behavior
+        
+            var formData = $(this).serialize(); // Serialize the form data
+        
+            $.ajax({
+                type: 'POST',
+                url: '/getChapURL', // Replace with your server endpoint
+                data: formData,
+                success: function(response) {
+                // Handle the response from the server
+                console.log(response);
+                },
+                error: function(xhr, status, error) {
+                // Handle any error that occurred during the request
+                console.error(error);
+                }
+            });                       
+            });
+        });
+          
+    </script>
+<head>
+<meta charset=utf-8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Epub Builder: The Wandering Inn</title>
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="preload" as="font">
+<link href="/assets/cloud-run-36-color.png" rel="icon" type="image/png" />
+<link href="/assets/style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+	<div class="container">
+		<div class="hero">
+			<div style="text-align:center;">
+				<picture>
+					<source srcset="/assets/celebration-dark.svg" media="(prefers-color-scheme: dark)">
+					<img src="/assets/celebration.svg" alt="A group celebrating" width="427" height="231">
+				</picture>
+			</div>
+
+			<div class="message">
+				<h2>
+                    Below are options for getting the 'Epub' version of web novels. It is designed for
+                    the book 'The Wandering Inn'. You must first update the book on file by using the 
+                    request for the most recent chapter or providing your own URL. After that you need to
+                    click on the download link. If the link text hasn't changed after updating the book on file,
+                    try refreshing the page. Enjoy! 
+                </h2>
+			</div>
+		</div>
+        
+        <h1>Download</h1>
+        <p>Click the link below to download the file, may need to update it with below options:</p>
+        <div id="linkContainer">
+            <a id="dynamicLink" href="assets/{{.LatestChapter}}" download>{{.LatestChapter}}</a>
+        </div>
+        <br>
+
+		<a href="#" onclick="handleAutoChapter();">Click Here to load a newer version</a>
+        
+        <form id="altChapForm">
+            Get alternative chapter: <input type="text" name="chapterURL" value="Type URL, Press Enter">
+            <input type="submit" value="Submit">
+        </form>
+
+        <button onclick="updateLink();">Reload after change</button>
+	</div>
+</body>
+</html>
